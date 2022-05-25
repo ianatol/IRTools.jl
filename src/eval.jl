@@ -5,7 +5,11 @@ dummy() = return
 function build_codeinfo(ir::IR)
   ir = copy(ir)
   ci = code_lowered(dummy, Tuple{})[1]
-  ci.inlineable = true
+  @static if isdefined(Core.Compiler, :set_inlineable!)
+    Core.Compiler.set_inlineable!(ci, true)
+  else
+    ci.inlineable = true
+  end
   for arg in arguments(ir)
     push!(ci.slotnames, Symbol(""))
     push!(ci.slotflags, 0)
